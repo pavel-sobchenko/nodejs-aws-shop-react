@@ -2,6 +2,7 @@ import React from "react";
 import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import axios from "axios";
+import { useError } from "~/context/ErrorContext";
 
 type CSVFileImportProps = {
   url: string;
@@ -10,7 +11,6 @@ type CSVFileImportProps = {
 
 export default function CSVFileImport({ url, title }: CSVFileImportProps) {
   const [file, setFile] = React.useState<File>();
-
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
@@ -18,6 +18,7 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
       setFile(file);
     }
   };
+  const { handleError } = useError();
 
   const removeFile = () => {
     setFile(undefined);
@@ -28,24 +29,35 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
 
     // Get the presigned URL
     if (file) {
-      const response = await axios({
-        method: "GET",
-        url,
-        params: {
-          name: encodeURIComponent(file.name),
-        },
-      });
-      console.log("File to upload: ", file.name);
-      console.log("Uploading to: ", response.data.signedUrl);
-      const result = await fetch(response.data.signedUrl, {
-        method: "PUT",
-        body: file,
-        headers: {
-          "Content-Type": "text/csv",
-        },
-      });
-      console.log("Result: ", result);
-      setFile(undefined);
+      const authorization_token = Buffer.from(
+        localStorage.getItem("authorization_token") || ""
+      ).toString();
+      try {
+        const response = await axios({
+          method: "GET",
+          url,
+          params: {
+            name: encodeURIComponent(file.name),
+          },
+          headers: {
+            Authorization: `Basic ${authorization_token}`,
+          },
+        });
+        console.log("File to upload: ", file.name);
+        console.log("Uploading to: ", response.data.signedUrl);
+        const result = await fetch(response.data.signedUrl, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": "text/csv",
+            Authorization: `Basic ${authorization_token}`,
+          },
+        });
+        console.log("Result: ", result);
+        setFile(undefined);
+      } catch (error) {
+        handleError(error);
+      }
     }
   };
   return (
