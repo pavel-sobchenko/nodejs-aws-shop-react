@@ -8,7 +8,7 @@ const ErrorProvider = ({ children }) => {
   const handleError = (error) => {
     setError(error);
     console.log(error);
-    alert(`Code Error: 203\nError blablabla`);
+    alert(`Code Error: ${error}`);
   };
 
   const clearError = () => setError(null);

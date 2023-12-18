@@ -29,9 +29,9 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
 
     // Get the presigned URL
     if (file) {
-      const authorization_token = Buffer.from(
+      const authorization_token = btoa(
         localStorage.getItem("authorization_token") || ""
-      ).toString();
+      );
       try {
         const response = await axios({
           method: "GET",
@@ -50,7 +50,6 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
           body: file,
           headers: {
             "Content-Type": "text/csv",
-            Authorization: `Basic ${authorization_token}`,
           },
         });
         console.log("Result: ", result);
