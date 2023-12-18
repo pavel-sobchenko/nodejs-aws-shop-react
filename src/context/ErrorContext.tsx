@@ -6,37 +6,33 @@ import React, {
   useState,
 } from "react";
 
-interface ErrorContextType {
-  error: null | Error;
-  handleError: (error: any) => void;
-  clearError: () => void;
+interface ErrorContextProps {
+  error: Error | null;
+  setError: (error: Error | null) => void;
 }
 
-interface ErrorProviderProps {
-  children: ReactNode; // Define the children prop
+interface Props {
+  children: ReactNode;
 }
 
-const ErrorContext = createContext<ErrorContextType | null>(null);
+const ErrorContext = createContext<ErrorContextProps | null>(null);
 
-const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
+const ErrorProvider: React.FC<Props> = ({ children }) => {
   const [error, setError] = useState<null | Error>(null);
 
-  const handleError = (error: any) => {
+  const handleError = (error: Error | null) => {
     setError(error);
     console.log(error);
     alert(`Code Error: ${error}`);
   };
 
-  const clearError = () => setError(null);
-
-  const contextValue: ErrorContextType = {
-    error,
-    handleError,
-    clearError,
-  };
+  //   const contextValue: ErrorContextProps = {
+  //     error,
+  //     setError: handleError
+  //   };
 
   return (
-    <ErrorContext.Provider value={contextValue}>
+    <ErrorContext.Provider value={{ error, setError: handleError }}>
       {children}
     </ErrorContext.Provider>
   );

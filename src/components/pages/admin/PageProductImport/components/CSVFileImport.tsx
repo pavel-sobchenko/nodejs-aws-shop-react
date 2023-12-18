@@ -18,7 +18,7 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
       setFile(file);
     }
   };
-  const { handleError } = useError();
+  const { setError } = useError();
 
   const removeFile = () => {
     setFile(undefined);
@@ -55,7 +55,7 @@ export default function CSVFileImport({ url, title }: CSVFileImportProps) {
         console.log("Result: ", result);
         setFile(undefined);
       } catch (error) {
-        handleError(error);
+        setError(error as Error);
       }
     }
   };
